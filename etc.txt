@@ -1,0 +1,4 @@
+
+# Hide Waydroid apps from the Linux menu
+
+sed --in-place --separate '/Actions=app_settings/aNoDisplay=true' ~/.local/share/applications/waydroid.*.desktop
