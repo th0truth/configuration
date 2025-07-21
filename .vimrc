@@ -25,5 +25,12 @@ let g:clang_snippets_engine='ultisnips'
 let g:clang_auto_select=2    " automatically select and insert the first match
 
 
-" disable search highlight
+" ==== disable search highlight
+
 map <esc> :noh <CR>
+
+" ==== navigation
+
+" Map 'q' to move to beginning of previous word
+nmap b <Nop>
+nmap q :normal! b<CR
