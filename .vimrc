@@ -8,7 +8,19 @@ call plug#begin()
   Plug 'scrooloose/nerdtree'
   Plug 'morhetz/gruvbox'
   Plug 'airblade/vim-gitgutter',
-  Plug 'dense-analysis/ale', { 'for': ['python', 'c', 'cpp'] }
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  
+  " Syntax highlighting
+  Plug 'octol/vim-cpp-enhanced-highlight'
+
+  " Code navigation
+  Plug 'preservim/tagbar'
+
+  " Code formatting
+  Plug 'rhysd/vim-clang-format'
+  
+  Plug 'Valloric/YouCompleteMe', { 'do': 'python3 install.py --clangd-completer --ts-completer' }
+  Plug 'fladson/vim-kitty'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
 call plug#end()
 
