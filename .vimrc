@@ -1,67 +1,73 @@
-# install vim-enhanced
-# install vim-plugin
+" === Vim-Plug Plugin Manager ===
 
-" === Configure vim plugins
+call plug#begin('~/.vim/plugged')
 
-call plug#begin()
-  Plug 'tpope/vim-sensible'
-  Plug 'scrooloose/nerdtree'
-  Plug 'morhetz/gruvbox'
-  Plug 'airblade/vim-gitgutter',
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
-  
-  " Syntax highlighting
-  Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'mattn/vim-lsp-settings'
+Plug 'preservim/nerdtree'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
-  " Code navigation
-  Plug 'preservim/tagbar'
-
-  " Code formatting
-  Plug 'rhysd/vim-clang-format'
-  
-  Plug 'Valloric/YouCompleteMe', { 'do': 'python3 install.py --clangd-completer --ts-completer' }
-  Plug 'fladson/vim-kitty'
-  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } | Plug 'junegunn/fzf.vim'
 call plug#end()
 
-" === Indentation settings
+" === Indentation settings ===
 
-set tabstop=2 softtabstop=2 shiftwidth=2
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
 set expandtab
 set number ruler
 set autoindent smartindent
 
-" === Apearance settings
+
+" === Appearance settings ===
 
 syntax enable
 filetype plugin indent on
 
-set termguicolors
-
 set background=dark
-colorscheme gruvbox
-
-let g:gruvbox_contrast_dark = 'hard'
+colorscheme habamax
 
 set t_Co=256
-set pumheight=10             " so the complete menu doesn't get too big
-set completeopt=menu,longest " menu, menuone, longest and preview
-let g:SuperTabDefaultCompletionType='context'
-let g:clang_complete_auto=0  " I can start the autocompletion myself, thanks..
-let g:clang_snippets=1       " use a snippet engine for placeholders
-let g:clang_snippets_engine='ultisnips'
-let g:clang_auto_select=2    " automatically select and insert the first match
+set pumheight=10 " completion menu height limit
+set completeopt=menuone,noinsert,noselect
 
 
-" === Navigation settings
+" === Navigation settings ===
 
-nnoremap <C-d> :NERDTreeToggle <CR>
-nnoremap <C-f> :Files <CR>
+nnoremap <C-d> :NERDTreeToggle<CR>
+nnoremap <C-f> :Files<CR>
 
-" disable search highlight
+" Disable search highlight with Esc
+nnoremap <esc> :noh<CR>
 
-map <esc> :noh <CR>
+" === LSP & Autocomplete settings ===
 
-" map 'q' to move to beginning of previous word
-nmap b <Nop>
-nmap q :normal! b<CR
+if executable('clangd')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'clangd',
+        \ 'cmd': {server_info->['clangd', '--background-index', '--clang-tidy']},
+        \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
+        \ })
+endif
+
+" Tab / Shift-Tab completion navigation
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR>    pumvisible() ? asyncomplete#close_popup() : "\<CR>"
+
+" LSP Shortcuts
+function! s:on_lsp_buffer_enabled()
+    setlocal omnifunc=lsp#complete
+    nmap <buffer> gd <plug>(lsp-definition)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> K <plug>(lsp-hover)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+endfunction
+
+augroup lsp_install
+    au!
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
