@@ -1,5 +1,4 @@
 " === Vim-Plug Plugin Manager ===
-
 call plug#begin('~/.vim/plugged')
 
 Plug 'prabirshrestha/vim-lsp'
@@ -13,7 +12,6 @@ Plug 'junegunn/fzf.vim'
 call plug#end()
 
 " === Indentation settings ===
-
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -21,9 +19,7 @@ set expandtab
 set number ruler
 set autoindent smartindent
 
-
 " === Appearance settings ===
-
 syntax enable
 filetype plugin indent on
 
@@ -31,12 +27,10 @@ set background=dark
 colorscheme habamax
 
 set t_Co=256
-set pumheight=10 " completion menu height limit
+set pumheight=10             " completion menu height limit
 set completeopt=menuone,noinsert,noselect
 
-
 " === Navigation settings ===
-
 nnoremap <C-d> :NERDTreeToggle<CR>
 nnoremap <C-f> :Files<CR>
 
@@ -44,7 +38,6 @@ nnoremap <C-f> :Files<CR>
 nnoremap <esc> :noh<CR>
 
 " === LSP & Autocomplete settings ===
-
 if executable('clangd')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'clangd',
@@ -52,6 +45,23 @@ if executable('clangd')
         \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp'],
         \ })
 endif
+
+if executable('rust-analyzer')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'rust-analyzer',
+        \ 'cmd': {server_info->['rust-analyzer']},
+        \ 'allowlist': ['rust'],
+        \ 'initialization_options': {
+        \     'cargo': {'buildScripts': {'enable': v:true}},
+        \     'procMacro': {'enable': v:true},
+        \     'checkOnSave': v:true,
+        \     'check': {'command': 'clippy'},
+        \ },
+        \ })
+endif
+
+" Format Rust buffers on save via rust-analyzer (rustfmt)
+autocmd BufWritePre *.rs call execute('LspDocumentFormatSync')
 
 " Tab / Shift-Tab completion navigation
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
